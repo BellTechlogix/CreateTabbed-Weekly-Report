@@ -2,7 +2,7 @@
 	CreateTabbed-Weekly Report.ps1
 	Created By - Kristopher Roy
 	Created On - Feb 21 2020
-	Modified On - March 12 2020
+	Modified On - Feb 19 2021
 
 	This Script combines multiple reports into a single tabbed report
 #>
@@ -293,7 +293,7 @@ add-content $XMLFile (
   </WorksheetOptions>
  </Worksheet>
  <Worksheet ss:Name="'+($runtime)+'-ADUsers">
-  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($ADUserscount+1)+'" x:FullColumns="1"
+  <Table ss:ExpandedColumnCount="12" ss:ExpandedRowCount="'+($ADUserscount+1)+'" x:FullColumns="1"
    x:FullRows="1" ss:DefaultRowHeight="15">
    <Column ss:AutoFitWidth="0" ss:Width="119.25"/>
    <Column ss:Width="111.75"/>
@@ -310,6 +310,8 @@ add-content $XMLFile (
     <Cell ss:StyleID="s62"><Data ss:Type="String">givenName</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">surName</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">UserPrincipalName</Data></Cell>
+	<Cell ss:StyleID="s62"><Data ss:Type="String">Domain</Data></Cell>
+	<Cell ss:StyleID="s62"><Data ss:Type="String">OU</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">LastLogonTimestamp</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">dayssincelogon</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">employeeType</Data></Cell>
