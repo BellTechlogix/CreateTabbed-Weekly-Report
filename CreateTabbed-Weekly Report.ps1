@@ -178,7 +178,7 @@ add-content $XMLFile (
   </WorksheetOptions>
  </Worksheet>
  <Worksheet ss:Name="'+($runtime)+'-AD-AllSystems">
-  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($qadallsyscount+1)+'" x:FullColumns="1"
+  <Table ss:ExpandedColumnCount="12" ss:ExpandedRowCount="'+($qadallsyscount+1)+'" x:FullColumns="1"
    x:FullRows="1" ss:DefaultRowHeight="15">
    <Column ss:AutoFitWidth="0" ss:Width="119.25"/>
    <Column ss:Width="111.75"/>
@@ -191,6 +191,8 @@ add-content $XMLFile (
    <Column ss:Width="141.75"/>
    <Row ss:AutoFitHeight="0">
     <Cell ss:StyleID="s62"><Data ss:Type="String">Name</Data></Cell>
+	<Cell ss:StyleID="s62"><Data ss:Type="String">Domain</Data></Cell>
+	<Cell ss:StyleID="s62"><Data ss:Type="String">OU</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">lastLogonTimestamp</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">dayssincelogon</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">userAccountControl</Data></Cell>
@@ -206,6 +208,8 @@ add-content $XMLFile (
    add-content $XMLFile ('
       <Row ss:AutoFitHeight="0">
     <Cell><Data ss:Type="String">'+($system.name)+'</Data></Cell>
+	<Cell><Data ss:Type="String">'+($system.domain)+'</Data></Cell>
+	<Cell><Data ss:Type="String">'+($system.ou)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system.lastLogonTimestamp)+'</Data></Cell>')
     If([int]$system.dayssincelogon -gt 90){add-content $XMLFile ('<Cell ss:StyleID="s64"><Data ss:Type="Number">'+($system.dayssincelogon)+'</Data></Cell>')}
     ElseIF([int]$system.dayssincelogon -gt 45 -and [int]$system.dayssincelogon -lt 90){add-content $xmlfile ('<Cell ss:StyleID="s65"><Data ss:Type="Number">'+($system.dayssincelogon)+'</Data></Cell>')}
