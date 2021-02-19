@@ -332,6 +332,8 @@ add-content $XMLFile (
     <Cell><Data ss:Type="String">'+($user.givenName)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($user.sn)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($user.UserPrincipalName)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($user.Domain)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($user.OU)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($user.LastLogonTimestamp)+'</Data></Cell>    
     ')
     If([int]$user.dayssincelogon -gt 90){add-content $XMLFile ('<Cell ss:StyleID="s64"><Data ss:Type="Number">'+($user.dayssincelogon)+'</Data></Cell>')}
@@ -366,9 +368,19 @@ $emailBody = $emailBody + "<h2>$org All Machine Count - '$qadallsyscount'</h2>"
 $emailBody = $emailBody + "<h2>$org All Users Count - '$aduserscount'</h2>"
 $emailBody = $emailBody + "<p><em>"+(Get-Date -Format 'MMM dd yyyy HH:mm')+"</em></p>"
 
-#Due to the size of the report we are zipping it prior to sending it
-if(test-path $rptFolder$runtime"ConsolidatedReport.zip"){del $rptFolder$runtime"ConsolidatedReport.zip"}
-Compress-Archive $rptFolder$runtime"ConsolidatedReport.xml" -DestinationPath $rptFolder$runtime"ConsolidatedReport.zip"
-
+#If you have excel installed on the system you are running this report on use the following code
+#Convert the file to XLSX
+$xlsSpreadsheet = 51
+$Excel = New-Object -Com Excel.Application
+$WorkBook = $Excel.Workbooks.Open($XMLFile)
+$WorkBook.SaveAs($XLSXFile, $xlsSpreadsheet)
+$Excel.Quit()
 #Last step is to email the report
-Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $rptFolder$runtime"ConsolidatedReport.zip"
+Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $XLSXFile
+
+#If you do not have excel, comment out the excel section and use this section
+#Due to the size of the report we are zipping it prior to sending it
+#if(test-path $rptFolder$runtime"ConsolidatedReport.zip"){del $rptFolder$runtime"ConsolidatedReport.zip"}
+#Compress-Archive $rptFolder$runtime"ConsolidatedReport.xml" -DestinationPath $rptFolder$runtime"ConsolidatedReport.zip"
+#Last step is to email the report
+#Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $rptFolder$runtime"ConsolidatedReport.zip"

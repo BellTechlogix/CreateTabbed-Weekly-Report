@@ -18,7 +18,7 @@ $org = "MyCompany"
 $domainRoot = "dc=mydomain,dc=com"
 $DC1 = 'mydc.mydomain.com'
 
-#If multiple domains
+#If multiple domains uncomment and use
 #$domainRoot2 = "dc=mydomain2,DC=com"
 #$DC2 = 'mydc.mydomain2.com'
 
@@ -49,7 +49,7 @@ if(!(Test-Path -Path $rptfolder)){
 }
 
 $qadusers = get-qaduser -searchroot $domainRoot -Service $DC1 -searchscope subtree -sizelimit 0 -includedproperties displayname,SamAccountName,givenName,sn,UserPrincipalName,memberof,telephoneNumber,mobile,mail,userAccountControl,whenCreated,whenChanged,lastlogondate,dayssincelogon,lastlogontimestamp,employeetype,description,office,City,cn,badPasswordTime,pwdLastSet,LockedOut,accountExpires,ProxyAddresses|Select-Object -Property displayname,SamAccountName,givenName,sn,UserPrincipalName,@{N='Domain';E={("$_.domain".split('\')[0])}},@{N='OU';E={($_.canonicalName -split('/')|select-object -skip 1 -Last 10) -Join "/"}},lastlogontimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},employeetype,@{N='userAccountControl';E={$lookup[$_.userAccountControl]}},@{N='Groups';E={[system.String]::Join(", ", ($_.memberof|get-adgroup|select name -expandproperty name))}},telephoneNumber,mobile,mail,whenCreated,whenChanged,description,office,City,badPasswordTime,pwdLastSet,LockedOut,accountExpires,@{N='ProxyAddresses';E={[system.String]::Join(", ", ($_.ProxyAddresses))}}|sort sn
-#If multiple domains
+#If multiple domains uncomment and use
 #$qadusers += get-qaduser -searchroot $domainRoot2 -Service $DC2 -searchscope subtree -sizelimit 0 -includedproperties displayname,SamAccountName,givenName,sn,UserPrincipalName,memberof,telephoneNumber,mobile,mail,userAccountControl,whenCreated,whenChanged,lastlogondate,dayssincelogon,lastlogontimestamp,employeetype,description,office,City,cn,badPasswordTime,pwdLastSet,LockedOut,accountExpires,ProxyAddresses|Select-Object -Property displayname,SamAccountName,givenName,sn,UserPrincipalName,@{N='Domain';E={("$_.domain".split('\')[0])}},@{N='OU';E={($_.canonicalName -split('/')|select-object -skip 1 -Last 10) -Join "/"}},lastlogontimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},employeetype,@{N='userAccountControl';E={$lookup[$_.userAccountControl]}},@{N='Groups';E={[system.String]::Join(", ", ($_.memberof|get-adgroup|select name -expandproperty name))}},telephoneNumber,mobile,mail,whenCreated,whenChanged,description,office,City,badPasswordTime,pwdLastSet,LockedOut,accountExpires,@{N='ProxyAddresses';E={[system.String]::Join(", ", ($_.ProxyAddresses))}}|sort sn
 
 

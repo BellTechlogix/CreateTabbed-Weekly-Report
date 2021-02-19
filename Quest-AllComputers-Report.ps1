@@ -16,7 +16,7 @@ Import-Module activedirectory
 $domainRoot = "dc=mydomain,dc=com"
 $DC1 = 'mydc.mydomain.com'
 
-#If multiple domains
+#If multiple domains uncoment and use
 #$domainRoot2 = "dc=mydomain2,DC=com"
 #$DC2 = 'mydc.mydomain2.com'
 
@@ -47,59 +47,69 @@ if(!(Test-Path -Path $rptfolder)){
 }
 
 $qadcomputers = Get-QADComputer -searchroot $domainRoot  -Service $DC1 -searchscope subtree -sizelimit 0 -includedproperties name,userAccountControl,whenCreated,whenChanged,lastlogondate,dayssincelogon,lastlogontimestamp,description,operatingSystem,operatingsystemservicepack|Select-Object -Property name,@{N='Domain';E={("$_.domain".split('\')[0])}},@{N='OU';E={($_.canonicalName -split('/')|select-object -skip 1 -Last 10) -Join "/"}},lastlogontimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},@{N='userAccountControl';E={$lookup[$_.userAccountControl]}},whenCreated,whenChanged,description,operatingSystem,operatingSystemVersion,operatingsystemservicepack|sort name
+#If multiple Domains uncomment and use
 #$qadcomputers += Get-QADComputer -searchroot $domainRoot2 -Service $DC2 -searchscope subtree -sizelimit 0 -includedproperties name,userAccountControl,whenCreated,whenChanged,lastlogondate,dayssincelogon,lastlogontimestamp,description,operatingSystem,operatingsystemservicepack|Select-Object -Property name,@{N='Domain';E={("$_.domain".split('\')[0])}},@{N='OU';E={($_.canonicalName -split('/')|select-object -skip 1 -Last 10) -Join "/"}},lastlogontimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},@{N='userAccountControl';E={$lookup[$_.userAccountControl]}},whenCreated,whenChanged,description,operatingSystem,operatingSystemVersion,operatingsystemservicepack|sort name
 
 $qadcomputers|export-csv $rptfolder$runtime-qAD-AllComputerReport.csv -NoTypeInformation
 
-$emailBody = "<h1>$org Weekly All Workstations Report</h1>"
-$emailBody = $emailBody + "<p><em>"+(Get-Date -Format 'MMM dd yyyy HH:mm')+"</em></p>"
+#If Running standalone un-comment to send mail
+<#
+	$emailBody = "<h1>$org Weekly All Workstations Report</h1>"
+	$emailBody = $emailBody + "<p><em>"+(Get-Date -Format 'MMM dd yyyy HH:mm')+"</em></p>"
 
-$htmlforEmail = $emailBody + @'
-<h2>Included Fields:</h2>
-<table style="height: 535px;" border="1" width="625">
-<tbody>
-<tr style="height: 47px;">
-<td style="width: 304px; height: 25px;"><strong>name</strong></td>
-<td style="width: 305px; height: 25px;"><em>&nbsp;Computer Name</em></td>
-</tr>
-<tr style="height: 47px;">
-<td style="width: 304px; height: 25px;"><strong>lastLogonTimestamp</strong></td>
-<td style="width: 305px; height: 25px;"><em>Last Recorded Timestamp for a logon</em></td>
-</tr>
-<tr style="height: 47px;">
-<td style="width: 304px; height: 25px;"><strong>dayssincelogon</strong></td>
-<td style="width: 305px; height: 25px;"><em>calculated from lastlogontimestamp</em></td>
-</tr>
-<tr style="height: 47px;">
-<td style="width: 304px; height: 25px;"><strong>userAccountControl</strong></td>
-<td style="width: 305px; height: 25px;"><em>User/Computer settings for AD</em></td>
-</tr>
-<tr style="height: 47px;">
-<td style="width: 304px; height: 25px;"><strong>whenCreated</strong></td>
-<td style="width: 305px; height: 25px;"><em>When account was created</em></td>
-</tr>
-<tr style="height: 29px;">
-<td style="width: 304px; height: 25px;"><strong>whenChanged</strong></td>
-<td style="width: 305px; height: 25px;"><em>Date AD changes were made to account</em></td>
-</tr>
-<tr style="height: 10px;">
-<td style="width: 304px; height: 25px;"><strong>description</strong></td>
-<td style="width: 305px; height: 25px;"><em>Description field from AD if populated</em></td>
-</tr>
-<tr style="height: 10px;">
-<td style="width: 304px; height: 25px;"><strong>operatingSystem</strong></td>
-<td style="width: 305px; height: 25px;"><em>&nbsp;OS Name</em></td>
-</tr>
-<tr style="height: 1px;">
-<td style="width: 304px; height: 25px;"><strong>operatingSystemVersion</strong></td>
-<td style="width: 305px; height: 25px;"><em>Version number of OS</em></td>
-</tr>
-<tr style="height: 24.3594px;">
-<td style="width: 304px; height: 25px;"><strong>operatingSystemServicePack</strong></td>
-<td style="width: 305px; height: 25px;"><em>OS Service Pack installed, if any</em></td>
-</tr>
-</tbody>
-</table>
-'@
+	$htmlforEmail = $emailBody + @'
+	<h2>Included Fields:</h2>
+	<table style="height: 535px;" border="1" width="625">
+	<tbody>
+	<tr style="height: 47px;">
+	<td style="width: 304px; height: 25px;"><strong>name</strong></td>
+	<td style="width: 305px; height: 25px;"><em>&nbsp;Computer Name</em></td>
+	</tr>
+	<tr style="height: 47px;">
+	<td style="width: 304px; height: 25px;"><strong>lastLogonTimestamp</strong></td>
+	<td style="width: 305px; height: 25px;"><em>Last Recorded Timestamp for a logon</em></td>
+	</tr>
+	<tr style="height: 47px;">
+	<td style="width: 304px; height: 25px;"><strong>dayssincelogon</strong></td>
+	<td style="width: 305px; height: 25px;"><em>calculated from lastlogontimestamp</em></td>
+	</tr>
+	<tr style="height: 47px;">
+	<td style="width: 304px; height: 25px;"><strong>userAccountControl</strong></td>
+	<td style="width: 305px; height: 25px;"><em>User/Computer settings for AD</em></td>
+	</tr>
+	<tr style="height: 47px;">
+	<td style="width: 304px; height: 25px;"><strong>whenCreated</strong></td>
+	<td style="width: 305px; height: 25px;"><em>When account was created</em></td>
+	</tr>
+	<tr style="height: 29px;">
+	<td style="width: 304px; height: 25px;"><strong>whenChanged</strong></td>
+	<td style="width: 305px; height: 25px;"><em>Date AD changes were made to account</em></td>
+	</tr>
+	<tr style="height: 10px;">
+	<td style="width: 304px; height: 25px;"><strong>description</strong></td>
+	<td style="width: 305px; height: 25px;"><em>Description field from AD if populated</em></td>
+	</tr>
+	<tr style="height: 10px;">
+	<td style="width: 304px; height: 25px;"><strong>operatingSystem</strong></td>
+	<td style="width: 305px; height: 25px;"><em>&nbsp;OS Name</em></td>
+	</tr>
+	<tr style="height: 1px;">
+	<td style="width: 304px; height: 25px;"><strong>operatingSystemVersion</strong></td>
+	<td style="width: 305px; height: 25px;"><em>Version number of OS</em></td>
+	</tr>
+	<tr style="height: 24.3594px;">
+	<td style="width: 304px; height: 25px;"><strong>operatingSystemServicePack</strong></td>
+	<td style="width: 305px; height: 25px;"><em>OS Service Pack installed, if any</em></td>
+	</tr>
+	</tbody>
+	</table>
+	'@
 
-Send-MailMessage -from $from -to $recipients -subject "$org All Workstations Report" -smtpserver $smtp -BodyAsHtml $htmlforEmail -Attachments $rptfolder$runtime-qAD-AllComputerReport.csv
+	Send-MailMessage -from $from -to $recipients -subject "$org All Workstations Report" -smtpserver $smtp -BodyAsHtml $htmlforEmail -Attachments $rptfolder$runtime-qAD-AllComputerReport.csv
+#>
+
+#Cleanup Old Files
+$Daysback = '-14'
+$CurrentDate = Get-Date
+$DateToDelete = $CurrentDate.AddDays($Daysback)
+Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*qAD-AllComputerReport*"} | Remove-Item
