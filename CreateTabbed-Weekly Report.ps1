@@ -21,7 +21,7 @@ $recipients = @("MyName <MyName@belltechlogix.com>")
 $from = "ADReports@Domain.com"
 
 #smtpserver
-$smtp = "smtp@domain.com"
+$smtp = "smtp.domain.com"
 
 #Timestamp
 $runtime = Get-Date -Format "yyyyMMMdd"
@@ -384,3 +384,9 @@ Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekl
 #Compress-Archive $rptFolder$runtime"ConsolidatedReport.xml" -DestinationPath $rptFolder$runtime"ConsolidatedReport.zip"
 #Last step is to email the report
 #Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $rptFolder$runtime"ConsolidatedReport.zip"
+
+#Cleanup Old Files
+$Daysback = '-14'
+$CurrentDate = Get-Date
+$DateToDelete = $CurrentDate.AddDays($Daysback)
+Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*Consolidated*"} | Remove-Item
