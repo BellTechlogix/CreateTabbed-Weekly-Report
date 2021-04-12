@@ -29,6 +29,9 @@ $runtime = Get-Date -Format "yyyyMMMdd"
 #XMLFile for output
 $XMLFile = $rptFolder+$runtime+"ConsolidatedReport.xml"
 
+#XLSXFile for output
+$XLSXFile = $rptFolder+$runtime+"ConsolidatedReport.xlsx"
+
 #report1 45Day Computer Report to import
 $tab1 = $rptfolder+$runtime+"-qADComputerReport-45.csv"
 
