@@ -1,6 +1,6 @@
 ﻿<#
-	CreateTabbed-Weekly Report.ps1
-	****SCCM Version****
+	CreateTabbed-Weekly Report-Ivanti.ps1
+	****Ivanti Version****
 	Created By - Kristopher Roy
 	Created On - Feb 21 2020
 	Modified On - Apr 12 2021
@@ -10,28 +10,25 @@
 
 
 #Organization that the report is for
-$org = "My Org"
+$org = "MyCompany"
 
 #folder to store completed reports
 $rptfolder = "c:\reports\"
 
 #mail recipients for sending report
-$recipients = @("MyName <MyName@belltechlogix.com>")
+$recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>")
 
 #from address
-$from = "Reports@Domain.com"
+$from = "Reports@wherever.com"
 
 #smtpserver
-$smtp = "smtp.domain.com"
+$smtp = "mail.wherever.com"
 
 #Timestamp
 $runtime = Get-Date -Format "yyyyMMMdd"
 
 #XMLFile for output
-$XMLFile = $rptFolder+$runtime+"ConsolidatedReport.xml"
-
-#XLSXFile for output
-$XLSXFile = $rptFolder+$runtime+"ConsolidatedReport.xlsx"
+$XMLFile = $rptFolder+"ConsolidatedReport.xml"
 
 #report1 45Day Computer Report to import
 $tab1 = $rptfolder+$runtime+"-qADComputerReport-45.csv"
@@ -47,19 +44,28 @@ $tab2 = $rptfolder+$runtime+"-qAD-AllComputerReport.csv"
 $qadallsys = import-csv $tab2
 $qadallsyscount = $qadallsys.count
 
-#report3 SCCM detailed Report to import
-$tab3 = $rptfolder+$runtime+"-SCCMDetailedMachineReport.csv"
+#report3 Ivanti detailed Report to import
+$tab3 = $rptfolder+"IvantiAll-Weekly.csv"
 
-#csv 3 SCCM detailed Report to import
-$sccmsys = import-csv $tab3
-$sccmsyscount = $sccmsys.count
+#csv 3 Ivanti detailed Report to import
+$Ivantisys = import-csv $tab3
+$Ivantisyscount = $Ivantisys.count
 
 #report4 ADUser Report to import
 $tab4 = $rptfolder+$runtime+"-qADUserReport.csv"
 
-#csv 3 SCCM detailed Report to import
+#csv 3 Ivanti detailed Report to import
 $adusers = import-csv $tab4
 $aduserscount = $adusers.count
+
+#Zip File Function
+function ZipFiles( $zipfilename, $sourcedir )
+{
+   Add-Type -Assembly System.IO.Compression.FileSystem
+   $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,
+        $zipfilename, $compressionLevel, $false)
+}
 
 #Lets create our XML File, this is the initial formatting that it will need to understand what it is, and what styles we are using.
 (
@@ -122,8 +128,7 @@ xmlns:html="http://www.w3.org/TR/REC-html40">
   </Style>
  </Styles>')>$XMLFile
 
- #Lets Create and fill our Excel Tabs
- #Tab1 Report
+#Tab1 Report
 add-content $XMLFile (
  '<Worksheet ss:Name="'+($runtime)+'-ADComputerReport-45">
   <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($qad45reportcount+1)+'" x:FullColumns="1"
@@ -182,7 +187,7 @@ add-content $XMLFile (
   </WorksheetOptions>
  </Worksheet>
  <Worksheet ss:Name="'+($runtime)+'-AD-AllSystems">
-  <Table ss:ExpandedColumnCount="12" ss:ExpandedRowCount="'+($qadallsyscount+1)+'" x:FullColumns="1"
+  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($qadallsyscount+1)+'" x:FullColumns="1"
    x:FullRows="1" ss:DefaultRowHeight="15">
    <Column ss:AutoFitWidth="0" ss:Width="119.25"/>
    <Column ss:Width="111.75"/>
@@ -195,8 +200,6 @@ add-content $XMLFile (
    <Column ss:Width="141.75"/>
    <Row ss:AutoFitHeight="0">
     <Cell ss:StyleID="s62"><Data ss:Type="String">Name</Data></Cell>
-	<Cell ss:StyleID="s62"><Data ss:Type="String">Domain</Data></Cell>
-	<Cell ss:StyleID="s62"><Data ss:Type="String">OU</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">lastLogonTimestamp</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">dayssincelogon</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">userAccountControl</Data></Cell>
@@ -212,8 +215,6 @@ add-content $XMLFile (
    add-content $XMLFile ('
       <Row ss:AutoFitHeight="0">
     <Cell><Data ss:Type="String">'+($system.name)+'</Data></Cell>
-	<Cell><Data ss:Type="String">'+($system.domain)+'</Data></Cell>
-	<Cell><Data ss:Type="String">'+($system.ou)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system.lastLogonTimestamp)+'</Data></Cell>')
     If([int]$system.dayssincelogon -gt 90){add-content $XMLFile ('<Cell ss:StyleID="s64"><Data ss:Type="Number">'+($system.dayssincelogon)+'</Data></Cell>')}
     ElseIF([int]$system.dayssincelogon -gt 45 -and [int]$system.dayssincelogon -lt 90){add-content $xmlfile ('<Cell ss:StyleID="s65"><Data ss:Type="Number">'+($system.dayssincelogon)+'</Data></Cell>')}
@@ -243,8 +244,8 @@ add-content $XMLFile (
    <ProtectScenarios>False</ProtectScenarios>
   </WorksheetOptions>
  </Worksheet>
- <Worksheet ss:Name="'+($runtime)+'-SCCM-Detailed">
-  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($sccmsyscount+1)+'" x:FullColumns="1"
+ <Worksheet ss:Name="'+($runtime)+'-Ivanti-Detailed">
+  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($Ivantisyscount+1)+'" x:FullColumns="1"
    x:FullRows="1" ss:DefaultRowHeight="15">
    <Column ss:AutoFitWidth="0" ss:Width="119.25"/>
    <Column ss:Width="111.75"/>
@@ -257,32 +258,32 @@ add-content $XMLFile (
    <Column ss:AutoFitWidth="0" ss:Width="55.5"/>
    <Column ss:AutoFitWidth="0" ss:Width="229.5"/>
    <Row ss:AutoFitHeight="0">
-    <Cell ss:StyleID="s62"><Data ss:Type="String">Name</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">Heartbeat</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">Primary Users</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Computer</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Scan Date</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Last User</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">Operating System</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">Serial Number</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">Manufacturer</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">Model</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">ResourceID</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Agent</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Type</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">IP</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">DeviceID</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">Has Client</Data></Cell>
-    <Cell ss:StyleID="s62"><Data ss:Type="String">UniqueID</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Client Version</Data></Cell>
    </Row>')
 
-   FOREACH($system in $sccmsys)
+   FOREACH($system in $Ivantisys)
    {
    add-content $XMLFile ('
       <Row ss:AutoFitHeight="0">
     <Cell><Data ss:Type="String">'+($system."Computer Name")+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system.Heartbeat)+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system."Primary Users")+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system."Scan Date")+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system."Last User")+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system."Operating System")+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system."Serial Number")+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system.Manufacturer)+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system.Model)+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system.ResourceID)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system."Agent Configuration Name")+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system.Type)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system.IP)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system.DeviceID)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system.IsClient)+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($system.UniqueID)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system."Client Version")+'</Data></Cell>
    </Row>')
    }
   $system = $null
@@ -301,7 +302,7 @@ add-content $XMLFile (
   </WorksheetOptions>
  </Worksheet>
  <Worksheet ss:Name="'+($runtime)+'-ADUsers">
-  <Table ss:ExpandedColumnCount="12" ss:ExpandedRowCount="'+($ADUserscount+1)+'" x:FullColumns="1"
+  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($ADUserscount+1)+'" x:FullColumns="1"
    x:FullRows="1" ss:DefaultRowHeight="15">
    <Column ss:AutoFitWidth="0" ss:Width="119.25"/>
    <Column ss:Width="111.75"/>
@@ -318,8 +319,6 @@ add-content $XMLFile (
     <Cell ss:StyleID="s62"><Data ss:Type="String">givenName</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">surName</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">UserPrincipalName</Data></Cell>
-	<Cell ss:StyleID="s62"><Data ss:Type="String">Domain</Data></Cell>
-	<Cell ss:StyleID="s62"><Data ss:Type="String">OU</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">LastLogonTimestamp</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">dayssincelogon</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">employeeType</Data></Cell>
@@ -336,8 +335,6 @@ add-content $XMLFile (
     <Cell><Data ss:Type="String">'+($user.givenName)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($user.sn)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($user.UserPrincipalName)+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($user.Domain)+'</Data></Cell>
-    <Cell><Data ss:Type="String">'+($user.OU)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($user.LastLogonTimestamp)+'</Data></Cell>    
     ')
     If([int]$user.dayssincelogon -gt 90){add-content $XMLFile ('<Cell ss:StyleID="s64"><Data ss:Type="Number">'+($user.dayssincelogon)+'</Data></Cell>')}
@@ -365,32 +362,18 @@ add-content $XMLFile (
 </Workbook>')
 
 
-#This Section Builds out the email body
 $emailBody = "<h1>$org Weekly Consolidated Report</h1>"
 $emailBody = $emailBody + "<h2>$org 45 Day Machine Count - '$qad45reportcount'</h2>"
 $emailBody = $emailBody + "<h2>$org All Machine Count - '$qadallsyscount'</h2>"
 $emailBody = $emailBody + "<h2>$org All Users Count - '$aduserscount'</h2>"
 $emailBody = $emailBody + "<p><em>"+(Get-Date -Format 'MMM dd yyyy HH:mm')+"</em></p>"
 
-#If you have excel installed on the system you are running this report on use the following code
-#Convert the file to XLSX
-$xlsSpreadsheet = 51
-$Excel = New-Object -Com Excel.Application
-$WorkBook = $Excel.Workbooks.Open($XMLFile)
-$WorkBook.SaveAs($XLSXFile, $xlsSpreadsheet)
-$Excel.Quit()
-#Last step is to email the report
-Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $XLSXFile
+if(test-path $rptFolder"ConsolidatedReport.zip"){del $rptFolder"ConsolidatedReport.zip"}
+Compress-Archive $rptFolder"ConsolidatedReport.xml" -DestinationPath $rptFolder"ConsolidatedReport.zip"
+Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $rptFolder"ConsolidatedReport.zip"
 
-#If you do not have excel, comment out the excel section and use this section
-#Due to the size of the report we are zipping it prior to sending it
-#if(test-path $rptFolder$runtime"ConsolidatedReport.zip"){del $rptFolder$runtime"ConsolidatedReport.zip"}
-#Compress-Archive $rptFolder$runtime"ConsolidatedReport.xml" -DestinationPath $rptFolder$runtime"ConsolidatedReport.zip"
-#Last step is to email the report
-#Send-MailMessage -from $from -to $recipients -subject "$org - Consolidated Weekly Report" -smtpserver $smtp -BodyAsHtml $emailbody -Attachments $rptFolder$runtime"ConsolidatedReport.zip"
-
-#Cleanup Old Files
-$Daysback = '-14'
+#cleanup old coppies
+$Daysback = '-30'
 $CurrentDate = Get-Date
 $DateToDelete = $CurrentDate.AddDays($Daysback)
 Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*Consolidated*"} | Remove-Item

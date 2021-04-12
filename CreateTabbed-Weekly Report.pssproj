@@ -27,6 +27,7 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
+    <Compile Include="CreateTabbed-Weekly Report-Ivanti.ps1" />
     <Compile Include="CreateTabbed-Weekly Report.ps1" />
     <Compile Include="Ivanti-Computer-Info.ps1" />
     <Compile Include="QADUser Report.ps1" />
