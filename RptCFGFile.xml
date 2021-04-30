@@ -2,8 +2,8 @@
   <DefaultSettings>
     <OrgName>Customer</OrgName>
     <ReportFolder>d:\Reports\</ReportFolder>
-    <DomainRoot>"dc=mydomain,dc=com"</DomainRoot>
-    <DomainRoot2>"dc=mydomain2,dc=com"</DomainRoot2>
+    <DomainRoot>dc=mydomain,dc=com</DomainRoot>
+    <DomainRoot2>dc=mydomain2,dc=com</DomainRoot2>
     <DC>mydc.mydomain.com</DC>
     <DC2>mydc2.mydomain.com</DC2>
   </DefaultSettings>

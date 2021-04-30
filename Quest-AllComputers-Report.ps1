@@ -119,4 +119,4 @@ $qadcomputers|export-csv $rptfolder$runtime-qAD-AllComputerReport.csv -NoTypeInf
 $Daysback = '-14'
 $CurrentDate = Get-Date
 $DateToDelete = $CurrentDate.AddDays($Daysback)
-Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*qAD-AllComputerReport*"} | Remove-Item
+Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*-qAD-AllComputerReport.csv"} | Remove-Item
