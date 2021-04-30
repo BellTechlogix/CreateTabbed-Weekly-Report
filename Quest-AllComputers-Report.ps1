@@ -2,7 +2,7 @@
 	Quest-AllComputers-Report.ps1
 	Created By - Kristopher Roy
 	Created On - May 2017
-	Modified On - 19 Feb 2020
+	Modified On - 28 Apr 2021
 
 	This Script Requires that the Quest_ActiveRolesManagementShellforActiveDirectory be installed https://www.powershelladmin.com/wiki/Quest_ActiveRoles_Management_Shell_Download
 	Pulls a report of all Systems in an Active Directory Structure as defined by Domain Root
@@ -12,25 +12,32 @@
 add-pssnapin quest.activeroles.admanagement
 Import-Module activedirectory
 
+#config file
+$scriptpath = "F:\Scripts"
+[xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
+
+#Organization that the report is for
+$org = $cfg.Settings.DefaultSettings.OrgName
+
 #modify this for your searchroot can be as broad or as narrow as you need down to OU
-$domainRoot = "dc=mydomain,dc=com"
-$DC1 = 'mydc.mydomain.com'
+$domainRoot = $cfg.Settings.DefaultSettings.DomainRoot
+$DC1 = $cfg.Settings.DefaultSettings.DC
 
 #If multiple domains uncoment and use
-#$domainRoot2 = "dc=mydomain2,DC=com"
-#$DC2 = 'mydc.mydomain2.com'
+#$domainRoot2 = $cfg.Settings.DefaultSettings.DomainRoot2
+#$DC2 = $cfg.Settings.DefaultSettings.DC2
 
 #folder to store completed reports
-$rptfolder = "c:\reports\"
+$rptfolder = $cfg.Settings.DefaultSettings.ReportFolder
 
 #mail recipients for sending report
 $recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>")
 
 #from address
-$from = "ADReports@wherever.com"
+$from = $cfg.Settings.EmailSettings.FromAddress
 
 #smtpserver
-$smtp = "mail.wherever.com"
+$smtp = $cfg.Settings.EmailSettings.SMTPServer
 
 #Timestamp
 $runtime = Get-Date -Format "yyyyMMMdd"

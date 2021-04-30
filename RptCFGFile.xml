@@ -1,0 +1,25 @@
+<Settings>
+  <DefaultSettings>
+    <OrgName>Customer</OrgName>
+    <ReportFolder>d:\Reports\</ReportFolder>
+    <DomainRoot>"dc=mydomain,dc=com"</DomainRoot>
+    <DomainRoot2>"dc=mydomain2,dc=com"</DomainRoot2>
+    <DC>mydc.mydomain.com</DC>
+    <DC2>mydc2.mydomain.com</DC2>
+  </DefaultSettings>
+
+	<SCCMSettings>
+		<SCCMServer>SCCMServer.domain.local</SCCMServer>
+		<SiteCode>CMW</SiteCode>
+		<SQLInstance>SQLServer.domain.com</SQLInstance>
+		<DB>CM_CMW</DB>
+		<SMSProviderServerName>JAXSCCM02</SMSProviderServerName>
+		<SMSDBServerName>JAXSCCM02</SMSDBServerName>		
+	</SCCMSettings>
+
+	<EmailSettings>
+		<SMTPServer>SMTP_Server_Name</SMTPServer>
+		<FromAddress>Reports@domainname.com</FromAddress>
+		<ToAddress>list of to addresses</ToAddress>
+	</EmailSettings>
+</Settings>

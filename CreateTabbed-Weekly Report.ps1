@@ -9,8 +9,15 @@
 #>
 
 
+add-pssnapin quest.activeroles.admanagement
+Import-Module activedirectory
+
+#config file
+$scriptpath = "F:\Scripts"
+[xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
+
 #Organization that the report is for
-$org = "My Org"
+$org = $cfg.Settings.DefaultSettings.OrgName
 
 #folder to store completed reports
 $rptfolder = "c:\reports\"
@@ -19,10 +26,10 @@ $rptfolder = "c:\reports\"
 $recipients = @("MyName <MyName@belltechlogix.com>")
 
 #from address
-$from = "Reports@Domain.com"
+$from = $cfg.Settings.EmailSettings.FromAddress
 
 #smtpserver
-$smtp = "smtp.domain.com"
+$smtp = $cfg.Settings.EmailSettings.SMTPServer
 
 #Timestamp
 $runtime = Get-Date -Format "yyyyMMMdd"
@@ -212,8 +219,8 @@ add-content $XMLFile (
    add-content $XMLFile ('
       <Row ss:AutoFitHeight="0">
     <Cell><Data ss:Type="String">'+($system.name)+'</Data></Cell>
-	<Cell><Data ss:Type="String">'+($system.domain)+'</Data></Cell>
-	<Cell><Data ss:Type="String">'+($system.ou)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system.domain)+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system.ou)+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system.lastLogonTimestamp)+'</Data></Cell>')
     If([int]$system.dayssincelogon -gt 90){add-content $XMLFile ('<Cell ss:StyleID="s64"><Data ss:Type="Number">'+($system.dayssincelogon)+'</Data></Cell>')}
     ElseIF([int]$system.dayssincelogon -gt 45 -and [int]$system.dayssincelogon -lt 90){add-content $xmlfile ('<Cell ss:StyleID="s65"><Data ss:Type="Number">'+($system.dayssincelogon)+'</Data></Cell>')}

@@ -25,7 +25,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="RptCFGFile.xml" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="CreateTabbed-Weekly Report-Ivanti.ps1" />
     <Compile Include="CreateTabbed-Weekly Report.ps1" />
