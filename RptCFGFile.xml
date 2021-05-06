@@ -13,6 +13,7 @@
 		<SiteCode>CMW</SiteCode>
 		<SQLInstance>SQLServer.domain.com</SQLInstance>
 		<DB>CM_CMW</DB>
+    <ReportDB>ReportServer</ReportDB>
 		<SMSProviderServerName>JAXSCCM02</SMSProviderServerName>
 		<SMSDBServerName>JAXSCCM02</SMSDBServerName>		
 	</SCCMSettings>
