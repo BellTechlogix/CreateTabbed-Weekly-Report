@@ -30,9 +30,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CreateTabbed-Weekly Report-Ivanti.ps1" />
-    <Compile Include="CreateTabbed-Weekly Report.ps1" />
+    <Compile Include="CreateTabbed-Weekly Report-SCCM.ps1" />
     <Compile Include="Ivanti-Computer-Info.ps1" />
     <Compile Include="QADUser Report.ps1" />
+    <Compile Include="QADWorkstationReport-45days.ps1" />
     <Compile Include="Quest-AllComputers-Report.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

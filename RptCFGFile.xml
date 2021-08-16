@@ -10,12 +10,13 @@
 
 	<SCCMSettings>
 		<SCCMServer>SCCMServer.domain.local</SCCMServer>
-		<SiteCode>CMW</SiteCode>
+    <strServers>Server01,Server02,Server03</strServers>
+    <SiteCode>CMW</SiteCode>
 		<SQLInstance>SQLServer.domain.com</SQLInstance>
 		<DB>CM_CMW</DB>
     <ReportDB>ReportServer</ReportDB>
-		<SMSProviderServerName>JAXSCCM02</SMSProviderServerName>
-		<SMSDBServerName>JAXSCCM02</SMSDBServerName>		
+		<SMSProviderServerName>SCCMServerName</SMSProviderServerName>
+		<SMSDBServerName>SCCMDBServerName</SMSDBServerName>		
 	</SCCMSettings>
 
 	<EmailSettings>
