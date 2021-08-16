@@ -2,47 +2,47 @@
 	SCCM-Computer-Info.ps1
 	Created By - Kristopher Roy
 	Created On - Feb 15 2020
-	Modified On - March 03 2020
+	Modified On - Aug 16 2021
 
 	This Script Grabs detailed info about Computers in SCCM, including the primary user
 #>
+
+#Timestamp
+$runtime = Get-Date -Format "yyyyMMMdd"
 
 #config file
 $scriptpath = "C:\Users\tankcr\source\repos\CreateTabbed-Weekly Report"
 [xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
 
 #Organization that the report is for
-$org = "MyCompany"
-
-#modify this for your searchroot can be as broad or as narrow as you need down to OU
-$domain = "domain.local"
+$org = $cfg.Settings.DefaultSettings.OrgName
 
 #folder to store completed reports
-$rptfolder = "c:\reports\"
+$rptfolder = $cfg.Settings.DefaultSettings.ReportFolder
+
+#modify this for your searchroot can be as broad or as narrow as you need down to OU
+$domain = $cfg.Settings.DefaultSettings.Domain
 
 #mail recipients for sending report
 $recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>")
 
 #from address
-$from = "ADReports@wherever.com"
+$from = $cfg.Settings.EmailSettings.FromAddress
 
 #smtpserver
-$smtp = "mail.wherever.com"
-
-#Timestamp
-$runtime = Get-Date -Format "yyyyMMMdd"
+$smtp = $cfg.Settings.EmailSettings.SMTPServer
 
 #primary SCCM server FQDN
-$smsserver="SCCM.domain.LOCAL"
+$smsserver = $cfg.Settings.ServerSettings.SCCMServer
 
 #Your SCCM Site Code
-$sitecode = "Code"
+$sitecode = $cfg.Settings.ServerSettings.SiteCode
 
 #Your sccm SQL Instance
-$instance = "sqlinstance"
+$instance = $cfg.Settings.ServerSettings.SQLInstance
 
 #Your SCCM SQL DB
-$DB = "SCCM Database"
+$DB = $cfg.Settings.ServerSettings.DB
 
 $modulepath="\\$smsserver\SMS_$sitecode\AdminConsole\bin"
 if ($env:username -eq "system"){

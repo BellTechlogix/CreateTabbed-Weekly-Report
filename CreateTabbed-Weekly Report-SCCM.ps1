@@ -20,7 +20,7 @@ $scriptpath = "F:\Scripts"
 $org = $cfg.Settings.DefaultSettings.OrgName
 
 #folder to store completed reports
-$rptfolder = "c:\reports\"
+$rptfolder = $cfg.Settings.DefaultSettings.ReportFolder
 
 #mail recipients for sending report
 $recipients = @("MyName <MyName@belltechlogix.com>")
