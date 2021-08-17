@@ -2,7 +2,7 @@
 	SCCM-Computer-Info.ps1
 	Created By - Kristopher Roy
 	Created On - Feb 15 2020
-	Modified On - Aug 16 2021
+	Modified On - Aug 17 2021
 
 	This Script Grabs detailed info about Computers in SCCM, including the primary user
 #>
@@ -24,7 +24,8 @@ $rptfolder = $cfg.Settings.DefaultSettings.ReportFolder
 $domain = $cfg.Settings.DefaultSettings.Domain
 
 #mail recipients for sending report
-$recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>")
+$recipients = ($cfg.Settings.EmailSettings.ToAddress).split(",")
+#$recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>")
 
 #from address
 $from = $cfg.Settings.EmailSettings.FromAddress
