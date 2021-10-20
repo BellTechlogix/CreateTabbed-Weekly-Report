@@ -240,18 +240,19 @@ Function Invoke-SQLQuery {
 }
 
 $string = @"
-SELECT DISTINCT A0.DISPLAYNAME AS "Computer Name", A2.ADDRESS AS "IP", A0.TYPE AS "Type", A0.LOGINNAME AS "Login Name", A0.FULLNAME AS "Last User", A0.HWLASTSCANDATE AS "Scan Date", A3.OSTYPE AS "Operating System", A4.RELEASEID AS "Release ID", A4.LASTBOOTUPTIME AS "Last Boot Up Time", A0.COMPUTERLOCATION AS "Computer Location", A1.CLIENTCONFIGURATIONNAME AS "Agent Configuration Name", A0.COMPUTER_IDN, A0.DEVICEID, A2.HOSTNAME, A0.HWMONITORINGTYPE, A1.LDMSMANAGED, A5.INSTALLED AS "IsClient", A6.VERSION AS "Client Version", A7.AVAILABLE, A7.HTML5_ENABLED, A7.RC_ENABLED  
-FROM Computer A0 (nolock) LEFT OUTER JOIN LanDesk A1 (nolock) ON A0.Computer_Idn = A1.Computer_Idn 
+SELECT DISTINCT A0.DISPLAYNAME AS "Computer Name", A2.ADDRESS AS "IP", A0.TYPE AS "Type", A0.LOGINNAME AS "Login Name", A0.FULLNAME AS "Last User", A0.HWLASTSCANDATE AS "Scan Date", A3.OSTYPE AS "Operating System", A4.RELEASEID AS "Release ID", A4.LASTBOOTUPTIME AS "Last Boot Up Time", A0.COMPUTERLOCATION AS "Computer Location", A1.CLIENTCONFIGURATIONNAME AS "Agent Configuration Name", A0.COMPUTER_IDN, A0.DEVICEID, A2.HOSTNAME, A0.HWMONITORINGTYPE, A1.LDMSMANAGED, A5.INSTALLED AS "IsClient", A6.VERSION AS "Client Version", A7.AVAILABLE, A7.HTML5_ENABLED, A7.RC_ENABLED,LDMS.SerialNumber,LDMS.AssetName,LDMS.AssetTag
+FROM Computer A0 (nolock) LEFT OUTER JOIN LanDesk A1 (nolock) ON A0.Computer_Idn = A1.Computer_Idn  
+LEFT OUTER JOIN LDMS_Computers LDMS ON A0.DisplayName = LDMS.AssetName
 LEFT OUTER JOIN TCP A2 (nolock) ON A0.Computer_Idn = A2.Computer_Idn 
 LEFT OUTER JOIN Operating_System A3 (nolock) ON A0.Computer_Idn = A3.Computer_Idn 
 LEFT OUTER JOIN OSNT A4 (nolock) ON A0.Computer_Idn = A4.Computer_Idn 
 LEFT OUTER JOIN WUserAgent A5 (nolock) ON A0.Computer_Idn = A5.Computer_Idn 
 LEFT OUTER JOIN Scanner A6 (nolock) ON A0.Computer_Idn = A6.Computer_Idn 
 LEFT OUTER JOIN AgentState_V A7 (nolock) ON A0.Computer_Idn = A7.Computer_Idn  
-ORDER BY  A0.DISPLAYNAME 
+ORDER BY  A0.DISPLAYNAME
 "@
 
-$discoverred = Invoke-SQLQuery -Instance $SQLInstance -Database $DB -Query $string|select 'Computer Name',"Scan Date","Last User","Operating System","Agent Configuration Name",Type,IP,@{N='DeviceID';E={(($_.DeviceID).replace("{","")).replace("}","")}},IsClient,"Client Version"
+$discoverred = Invoke-SQLQuery -Instance $SQLInstance -Database $DB -Query $string|select 'Computer Name',SerialNumber,"Scan Date","Last User","Operating System","Agent Configuration Name",Type,IP,@{N='DeviceID';E={(($_.DeviceID).replace("{","")).replace("}","")}},IsClient,"Client Version"
 $discoverred|where{$_.Installed -ne "Yes"}
 FOREACH($machine in $discoverred|where{$_."Operating System" -like ""}){
 $hostname = $machine."Computer Name"

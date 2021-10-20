@@ -245,7 +245,7 @@ add-content $XMLFile (
   </WorksheetOptions>
  </Worksheet>
  <Worksheet ss:Name="'+($runtime)+'-Ivanti-Detailed">
-  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="'+($Ivantisyscount+1)+'" x:FullColumns="1"
+  <Table ss:ExpandedColumnCount="11" ss:ExpandedRowCount="'+($Ivantisyscount+1)+'" x:FullColumns="1"
    x:FullRows="1" ss:DefaultRowHeight="15">
    <Column ss:AutoFitWidth="0" ss:Width="119.25"/>
    <Column ss:Width="111.75"/>
@@ -259,6 +259,7 @@ add-content $XMLFile (
    <Column ss:AutoFitWidth="0" ss:Width="229.5"/>
    <Row ss:AutoFitHeight="0">
     <Cell ss:StyleID="s62"><Data ss:Type="String">Computer</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">SerialNumber</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">Scan Date</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">Last User</Data></Cell>
     <Cell ss:StyleID="s62"><Data ss:Type="String">Operating System</Data></Cell>
@@ -275,6 +276,7 @@ add-content $XMLFile (
    add-content $XMLFile ('
       <Row ss:AutoFitHeight="0">
     <Cell><Data ss:Type="String">'+($system."Computer Name")+'</Data></Cell>
+    <Cell><Data ss:Type="String">'+($system."SerialNumber")+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system."Scan Date")+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system."Last User")+'</Data></Cell>
     <Cell><Data ss:Type="String">'+($system."Operating System")+'</Data></Cell>
