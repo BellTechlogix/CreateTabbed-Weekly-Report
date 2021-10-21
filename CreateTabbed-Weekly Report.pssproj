@@ -29,12 +29,16 @@
     <Content Include="RptCFGFile.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateTabbed-Weekly Report-Ivanti.ps1" />
-    <Compile Include="CreateTabbed-Weekly Report-SCCM.ps1" />
-    <Compile Include="Ivanti-Computer-Info.ps1" />
+    <Compile Include="Ivanti\CreateTabbed-Weekly Report-Ivanti.ps1" />
+    <Compile Include="SCCM\CreateTabbed-Weekly Report-SCCM.ps1" />
+    <Compile Include="Ivanti\Ivanti-Computer-Info.ps1" />
     <Compile Include="QADUser Report.ps1" />
     <Compile Include="QADWorkstationReport-45days.ps1" />
     <Compile Include="Quest-AllComputers-Report.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Ivanti\" />
+    <Folder Include="SCCM\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
