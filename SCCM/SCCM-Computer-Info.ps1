@@ -323,7 +323,7 @@ foreach($device in $devices)
     $device.'Primary User' =  (get-CMUserDeviceAffinity -DeviceName $device."Computer Name").UniqueUserName
     $heartbeat = $devices2|where{$_.'SMS_Unique_Identifier0' -like $device.UniqueID}
     $device.Heartbeat = $heartbeat.AgentTime
-    $test = $null
+    $device = $null
 
 }
 
@@ -336,3 +336,9 @@ $emailBody = $emailBody + "<h2>$org Machine Count - '$machinecount'</h2>"
 $emailBody = $emailBody + "<p><em>"+(Get-Date -Format 'MMM dd yyyy HH:mm')+"</em></p>"
 
 #Send-MailMessage -from $from -to $recipients -subject "$org - SCCM Detailed Machine Report" -smtpserver $smtp -BodyAsHtml $emailBody -Attachments $rptFolder$runtime-SCCMDetailedMachineReport.csv
+
+#Cleanup Old Files
+$Daysback = '-14'
+$CurrentDate = Get-Date
+$DateToDelete = $CurrentDate.AddDays($Daysback)
+Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*-SCCMDetailedMachineReport.csv"} | Remove-Item
