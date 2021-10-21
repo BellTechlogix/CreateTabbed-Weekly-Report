@@ -2,7 +2,7 @@
 	QADWorkstationReport-45days.ps1
 	Created By - Kristopher Roy
 	Created On - May 2017
-	Modified On - 08 Jan 2020
+	Modified On - 21 Oct 2021
 
 	This Script Requires that the Quest_ActiveRolesManagementShellforActiveDirectory be installed https://www.powershelladmin.com/wiki/Quest_ActiveRoles_Management_Shell_Download
 	Pulls a report of all non-server workstations that have logged in within 45days
@@ -11,23 +11,32 @@
 add-pssnapin quest.activeroles.admanagement
 Import-Module activedirectory
 
+#config file
+$scriptpath = "F:\Scripts"
+[xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
+
 #Organization that the report is for
-$org = "Calgon Carbon"
+$org = $cfg.Settings.DefaultSettings.OrgName
 
 #modify this for your searchroot can be as broad or as narrow as you need down to OU
-$domainRoot = "dc=calgcarb,dc=com"
+$domainRoot = $cfg.Settings.DefaultSettings.DomainRoot
+$DC1 = $cfg.Settings.DefaultSettings.DC
+
+#If multiple domains uncoment and use
+#$domainRoot2 = $cfg.Settings.DefaultSettings.DomainRoot2
+#$DC2 = $cfg.Settings.DefaultSettings.DC2
 
 #folder to store completed reports
-$rptfolder = "c:\reports\"
+$rptfolder = $cfg.Settings.DefaultSettings.ReportFolder
 
 #mail recipients for sending report
-$recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>","Tim <twheeler@belltechlogix.com>","Kristopher <kroy@belltechlogix.com>","Charles <cpowers@belltechlogix.com>")
+$recipients = @("BTL SCCM <sccm@belltechlogix.com>","BTL ITAMS <ITAM@belltechlogix.com>")
 
 #from address
-$from = "ADReports@calgoncarbon.com"
+$from = $cfg.Settings.EmailSettings.FromAddress
 
 #smtpserver
-$smtp = "lnsmtpus@calgcarb.com"
+$smtp = $cfg.Settings.EmailSettings.SMTPServer
 
 #Timestamp
 $runtime = Get-Date -Format "yyyyMMMdd"
@@ -101,3 +110,9 @@ $htmlforEmail = $emailBody + @'
 '@
 
 Send-MailMessage -from $from -to $recipients -subject $org-ADComputerReport-45Days -smtpserver $smtp -BodyAsHtml $htmlforEmail -Attachments $rptFolder$runtime-qADComputerReport-45.csv
+
+#Cleanup Old Files
+$Daysback = '-14'
+$CurrentDate = Get-Date
+$DateToDelete = $CurrentDate.AddDays($Daysback)
+Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*-qADComputerReport-45.csv"} | Remove-Item
