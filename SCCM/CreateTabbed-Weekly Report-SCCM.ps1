@@ -23,7 +23,7 @@ $org = $cfg.Settings.DefaultSettings.OrgName
 $rptfolder = $cfg.Settings.DefaultSettings.ReportFolder
 
 #mail recipients for sending report
-$recipients = @("MyName <MyName@belltechlogix.com>")
+$recipients = ($cfg.Settings.EmailSettings.ToAddress).split(",")
 
 #from address
 $from = $cfg.Settings.EmailSettings.FromAddress

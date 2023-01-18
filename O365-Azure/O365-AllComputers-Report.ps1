@@ -1,11 +1,10 @@
 ﻿<#
 	Quest-AllComputers-Report.ps1
 	Created By - Kristopher Roy
-	Created On - May 2017
-	Modified On - 28 Apr 2021
+	Created On - Oct 2021
+	Modified On - 11 Nov 2021
 
-	This Script Requires that the Quest_ActiveRolesManagementShellforActiveDirectory be installed https://www.powershelladmin.com/wiki/Quest_ActiveRoles_Management_Shell_Download
-	Pulls a report of all Systems in an Active Directory Structure as defined by Domain Root
+	This Script Requires that the Azure AD Module is installed
 #>
 
 
@@ -15,9 +14,6 @@ Import-Module activedirectory
 #config file
 $scriptpath = "F:\Scripts"
 [xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
-
-#Get Stored Credentials for Automation
-$StoredCred = Import-Clixml "C:\scripts\CRD\GTILCred.xml"
 
 #Organization that the report is for
 $org = $cfg.Settings.DefaultSettings.OrgName
@@ -44,7 +40,6 @@ $smtp = $cfg.Settings.EmailSettings.SMTPServer
 
 #Timestamp
 $runtime = Get-Date -Format "yyyyMMMdd"
-
 
 #deffinition for UAC codes
 $lookup = @{4096="Workstation/Server"; 4098="Disabled Workstation/Server"; 4128="Workstation/Server No PWD"; 
