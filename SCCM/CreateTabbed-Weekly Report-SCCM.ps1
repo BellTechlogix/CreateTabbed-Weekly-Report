@@ -10,14 +10,6 @@
 	This Script combines multiple reports into a single tabbed report
 #>
 
-#Verify most recent version being used
-$curver = $ver
-$data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CreateTabbed-Weekly-Report/master/O365-Azure/Intune-DeviceReport.ps1
-Invoke-Expression ($data.substring(0,13))
-if($curver -ge $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
-ELSEIF($curver -lt $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
-EXIT}
-
 
 add-pssnapin quest.activeroles.admanagement
 Import-Module activedirectory

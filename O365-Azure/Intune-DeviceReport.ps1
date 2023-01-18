@@ -1,4 +1,6 @@
-﻿<#
+﻿$ver = '1'
+
+<#
 	Intune-DeviceReport.ps1
 	Created By - Kristopher Roy
 	Created On - Mar 2022
@@ -6,6 +8,14 @@
 
 	This Script was modifdied from the original Microsoft Script
 #>
+
+#Verify most recent version being used
+$curver = $ver
+$data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CreateTabbed-Weekly-Report/master/O365-Azure/Intune-DeviceReport.ps1
+Invoke-Expression ($data.substring(0,13))
+if($curver -ge $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
+ELSEIF($curver -lt $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
+EXIT}
 
 {
 	<#
