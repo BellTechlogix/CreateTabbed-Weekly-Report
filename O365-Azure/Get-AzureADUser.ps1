@@ -1,4 +1,13 @@
-﻿# Function to check if a module is installed
+﻿<#
+	O365User Report.ps1
+	Created By - Kristopher Roy
+	Created On - 01 Mar 2023
+	Modified On - 03 May 2023
+
+	This Script Requires an Azure account with permissions to connect and pull users. Pulls a report of all Azure User accounts
+#>
+
+# Function to check if a module is installed
 function Check-Module {
   param (
     [string]$Name,
@@ -119,6 +128,8 @@ function Get-CurrentUserTenants {
   return $tenants
 }
 
+#Install-Module -Name Microsoft.Graph -RequiredVersion 2.0.0-preview8 -AllowPrerelease
+
 #$tenants = Get-CurrentUserTenants
 
 # Increase the function capacity
@@ -131,7 +142,7 @@ $MaximumFunctionCount = 32768
 Check-Module -Name Az
 
 # Force authentication
-Connect-MgGraph
+#Connect-MgGraph
 Connect-AzAccount
 
 $tenants = Get-CurrentUserTenants
@@ -148,9 +159,9 @@ Get-AzAdUser -select 'Department,AccountEnabled,Department,UserType,UserPrincipa
 
 $users|select UserType
 
-$azure_users = Get-AzADUser
-FOREACH($AZUser in $azure_users)
-{Get-MGUser}
+#$azure_users = Get-AzADUser
+#FOREACH($AZUser in $azure_users)
+#{Get-MGUser}
 
 # Create a variable to store the list of Azure users
 $azure_users_table = @()
