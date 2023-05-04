@@ -1,5 +1,5 @@
 ﻿<#
-	O365User Report.ps1
+	Get-AzureAdUser.ps1
 	Created By - Kristopher Roy
 	Created On - 01 Mar 2023
 	Modified On - 03 May 2023
