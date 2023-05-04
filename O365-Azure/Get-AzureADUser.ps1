@@ -128,7 +128,7 @@ function Get-CurrentUserTenants {
   return $tenants
 }
 
-#Install-Module -Name Microsoft.Graph -RequiredVersion 2.0.0-preview8 -AllowPrerelease
+Install-Module -Name Microsoft.Graph -RequiredVersion 2.0.0-preview8 -AllowPrerelease
 
 #$tenants = Get-CurrentUserTenants
 
