@@ -29,106 +29,38 @@ function Check-Module {
   }
 }
 
-#This function lets you build an array of specific list items you wish
-Function MultipleSelectionBox ($inputarray,$prompt,$listboxtype) {
- 
-# Taken from Technet - http://technet.microsoft.com/en-us/library/ff730950.aspx
-# This version has been updated to work with Powershell v3.0.
-# Had to replace $x with $Script:x throughout the function to make it work. 
-# This specifies the scope of the X variable.  Not sure why this is needed for v3.
-# http://social.technet.microsoft.com/Forums/en-SG/winserverpowershell/thread/bc95fb6c-c583-47c3-94c1-f0d3abe1fafc
-#
-# Function has 3 inputs:
-#     $inputarray = Array of values to be shown in the list box.
-#     $prompt = The title of the list box
-#     $listboxtype = system.windows.forms.selectionmode (None, One, MutiSimple, or MultiExtended)
- 
-$Script:x = @()
- 
-[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
-[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") 
- 
-$objForm = New-Object System.Windows.Forms.Form 
-$objForm.Text = $prompt
-$objForm.Size = New-Object System.Drawing.Size(300,600) 
-$objForm.StartPosition = "CenterScreen"
- 
-$objForm.KeyPreview = $True
- 
-$objForm.Add_KeyDown({if ($_.KeyCode -eq "Enter") 
-    {
-        foreach ($objItem in $objListbox.SelectedItems)
-            {$Script:x += $objItem}
-        $objForm.Close()
-    }
-    })
- 
-$objForm.Add_KeyDown({if ($_.KeyCode -eq "Escape") 
-    {$objForm.Close()}})
- 
-$OKButton = New-Object System.Windows.Forms.Button
-$OKButton.Location = New-Object System.Drawing.Size(75,520)
-$OKButton.Size = New-Object System.Drawing.Size(75,23)
-$OKButton.Text = "OK"
- 
-$OKButton.Add_Click(
-   {
-        foreach ($objItem in $objListbox.SelectedItems)
-            {$Script:x += $objItem}
-        $objForm.Close()
-   })
- 
-$objForm.Controls.Add($OKButton)
- 
-$CancelButton = New-Object System.Windows.Forms.Button
-$CancelButton.Location = New-Object System.Drawing.Size(150,520)
-$CancelButton.Size = New-Object System.Drawing.Size(75,23)
-$CancelButton.Text = "Cancel"
-$CancelButton.Add_Click({$objForm.Close()})
-$objForm.Controls.Add($CancelButton)
- 
-$objLabel = New-Object System.Windows.Forms.Label
-$objLabel.Location = New-Object System.Drawing.Size(10,20) 
-$objLabel.Size = New-Object System.Drawing.Size(280,20) 
-$objLabel.Text = "Please make a selection from the list below:"
-$objForm.Controls.Add($objLabel) 
- 
-$objListbox = New-Object System.Windows.Forms.Listbox 
-$objListbox.Location = New-Object System.Drawing.Size(10,40) 
-$objListbox.Size = New-Object System.Drawing.Size(260,20) 
- 
-$objListbox.SelectionMode = $listboxtype
- 
-$inputarray | ForEach-Object {[void] $objListbox.Items.Add($_)}
- 
-$objListbox.Height = 470
-$objForm.Controls.Add($objListbox) 
-$objForm.Topmost = $True
- 
-$objForm.Add_Shown({$objForm.Activate()})
-[void] $objForm.ShowDialog()
- 
-Return $Script:x
+function Connect-toAzure{
+    [CmdletBinding()]
+
+    param (
+        [Parameter(Mandatory = $false)]
+        [string]
+        $TenantId,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $SubscriptionId,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $ClientId,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $ClientSecret
+    )
+
+    $InformationPreference = "Continue"
+
+    Disable-AzContextAutosave -Scope Process | Out-Null
+
+    $creds = [System.Management.Automation.PSCredential]::new($ClientId, (ConvertTo-SecureString $ClientSecret -AsPlainText -Force))
+    Connect-AzAccount -Tenant $TenantId -Credential $creds -ServicePrincipal | Out-Null
+    Write-Information "Connected to Azure..."
+
 }
 
-function Get-CurrentUserTenants {
-  param (
-    [switch]$Export = $false
-  )
-
-  # Get the list of tenants that the user has access to
-  $tenants = Get-AzTenant | Select-Object Name, ID, @{N = 'Domains';E = {[System.String]::Join(", ", $_.Domains)}}
-
-  # If the Export switch is enabled, export the list of tenants to a CSV file
-  if ($Export) {
-    Export-Csv -Path "tenants.csv" -InputObject $tenants
-  }
-
-  # Return the list of tenants
-  return $tenants
-}
-
-Install-Module -Name Microsoft.Graph -RequiredVersion 2.0.0-preview8 -AllowPrerelease
+#Install-Module -Name Microsoft.Graph -AllowPrerelease
 
 #$tenants = Get-CurrentUserTenants
 
@@ -139,11 +71,18 @@ $MaximumFunctionCount = 32768
 #Check-Module -Name Microsoft.Graph -Import
 
 # Check if the AZ module is installed
-Check-Module -Name Az
+#Check-Module -Name Az
 
 # Force authentication
 #Connect-MgGraph
-Connect-AzAccount
+
+# Read the credentials
+$path = 'C:\Users\tankcr\source\repos\BellTechlogix\CreateTabbed-Weekly-Report\O365-Azure'
+$Credentials = Import-Clixml -Path $Path\Access.xml
+
+#Disconnect-MgGraph
+connect-MgGraph -TenantId '1f05524b-c860-46e3-a2e8-4072506b3e4a' -clientsecretcredential $credentials
+#Connect-toAzure -ClientId $ClientId -ClientSecret $ClientSecret -TenantId '1f05524b-c860-46e3-a2e8-4072506b3e4a'
 
 $tenants = Get-CurrentUserTenants
 
@@ -154,10 +93,19 @@ $selectedSubscription = MultipleSelectionBox -inputarray ($subscriptions).Name -
 $subscriptionID = ($subscriptions|where{$_.name -eq $selectedsubscription}).ID
 set-azContext -Subscription $SubscriptionID
 # Get the list of Azure users
-$users = Get-AzAdUser -select 'Department,AccountEnabled,Department,UserType,UserPrincipalName,GivenName,SurName,ApproximateLastSignInDateTime,Manager,JobTitle,Identity,EmployeeType,Department,Country,City,StreetAddress,State,PostalCode,OfficeLocation' -AppendSelected|select *
-Get-AzAdUser -select 'Department,AccountEnabled,Department,UserType,UserPrincipalName,GivenName,SurName,ApproximateLastSignInDateTime,Manager,JobTitle,Identity,EmployeeType,Department,Country,City,StreetAddress,State,PostalCode,OfficeLocation' -AppendSelected|select *|where($_.UserType -ne 'Guest')
+$users = get-mguser -filter "UserType eq 'Member'" -Property 'UserType,SignInActivity,AccountEnabled,City,CompanyName,Country,Department,DisplayName,GivenName,SurName,ID,JobTitle,Mail,MemberOf,State,UserPrincipalName,LastLogonTimestamp,SecurityIdentifier'|select *, @{N='LastLogonTimestamp';E={ [datetime]$_.LastLogonTimestamp}}
+FOREACH($user in $users)
+{
+    #get-MgUser -UserId $user.ID -Property SignInActivity|select LastSignInDateTime
+    If($User.AdditionalProperties.Values.lastSignInDateTime -ne $null)
+    {
+        $user.LastLogonTimestamp = get-date $User.AdditionalProperties.Values.lastSignInDateTime
+    }
+}
 
-$users|select UserType
+#Get-AzAdUser -select 'Department,AccountEnabled,Department,UserType,UserPrincipalName,GivenName,SurName,ApproximateLastSignInDateTime,Manager,JobTitle,Identity,EmployeeType,Department,Country,City,StreetAddress,State,PostalCode,OfficeLocation' -AppendSelected|select *|where($_.UserType -ne 'Guest')
+
+$users|select DisplayName,@{N='SID';E={($_.SecurityIdentifier)}},givenName,surName,UserPrincipalName,@{N='Domain';E={($_.UserPrincipalName.split('@')[1])}},Department,LastLogonTimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},JobTitle,ID,Groups
 
 #$azure_users = Get-AzADUser
 #FOREACH($AZUser in $azure_users)
