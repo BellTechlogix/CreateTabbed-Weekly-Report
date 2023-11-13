@@ -42,10 +42,7 @@ $smtp = $cfg.Settings.EmailSettings.SMTPServer
 $runtime = Get-Date -Format "yyyyMMMdd"
 
 #deffinition for UAC codes
-$lookup = @{4096="Workstation/Server"; 4098="Disabled Workstation/Server"; 4128="Workstation/Server No PWD"; 
-4130="Disabled Workstation/Server No PWD"; 528384="Workstation/Server Trusted for Delegation"; 83955712="Workstation/Server Partial Secrests Account/Trusted For Delegation/PWD not Expire";
-528416="Workstation/Server Trusted for Delegation"; 532480="Domain Controller"; 66176="Workstation/Server PWD not Expire"; 
-66178="Disabled Workstation/Server PWD not Expire";512="User Account";514="Disabled User Account";66048="User Account PWD Not Expire";66050="Disabled User Account PWD Not Expire"}
+5
 
 #creates the report folder if it doesn't exist
 if(!(Test-Path -Path $rptfolder)){

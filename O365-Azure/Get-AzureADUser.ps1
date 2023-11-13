@@ -2,10 +2,16 @@
 	Get-AzureAdUser.ps1
 	Created By - Kristopher Roy
 	Created On - 01 Mar 2023
-	Modified On - 03 May 2023
+	Modified On - 23 May 2023
 
-	This Script Requires an Azure account with permissions to connect and pull users. Pulls a report of all Azure User accounts
+	This Script Requires an Azure account or an App Registration with permissions. Pulls a report of all Azure User accounts
 #>
+
+#folder to store completed reports
+$rptfolder = "C:\Projects\GTIL\Reports\"
+
+#Timestamp
+$runtime = Get-Date -Format "yyyyMMMdd"
 
 # Function to check if a module is installed
 function Check-Module {
@@ -84,16 +90,16 @@ $Credentials = Import-Clixml -Path $Path\Access.xml
 connect-MgGraph -TenantId '1f05524b-c860-46e3-a2e8-4072506b3e4a' -clientsecretcredential $credentials
 #Connect-toAzure -ClientId $ClientId -ClientSecret $ClientSecret -TenantId '1f05524b-c860-46e3-a2e8-4072506b3e4a'
 
-$tenants = Get-CurrentUserTenants
+#$tenants = Get-CurrentUserTenants
 
-$selectedtenet = MultipleSelectionBox -inputarray $tenants.Name -listboxtype One -prompt "Select Your Tenant"
-$tenetID = ($tenants|where{$_.name -eq $selectedtenet}).ID
-$subscriptions = Get-AzSubscription
-$selectedSubscription = MultipleSelectionBox -inputarray ($subscriptions).Name -listboxtype One -prompt "Select Your Subscription"
-$subscriptionID = ($subscriptions|where{$_.name -eq $selectedsubscription}).ID
-set-azContext -Subscription $SubscriptionID
+#$selectedtenet = MultipleSelectionBox -inputarray $tenants.Name -listboxtype One -prompt "Select Your Tenant"
+#$tenetID = ($tenants|where{$_.name -eq $selectedtenet}).ID
+#$subscriptions = Get-AzSubscription
+#$selectedSubscription = MultipleSelectionBox -inputarray ($subscriptions).Name -listboxtype One -prompt "Select Your Subscription"
+#$subscriptionID = ($subscriptions|where{$_.name -eq $selectedsubscription}).ID
+#set-azContext -Subscription $SubscriptionID
 # Get the list of Azure users
-$users = get-mguser -filter "UserType eq 'Member'" -Property 'UserType,SignInActivity,AccountEnabled,City,CompanyName,Country,Department,DisplayName,GivenName,SurName,ID,JobTitle,Mail,MemberOf,State,UserPrincipalName,LastLogonTimestamp,SecurityIdentifier'|select *, @{N='LastLogonTimestamp';E={ [datetime]$_.LastLogonTimestamp}}
+$users = get-mguser -All -filter "UserType eq 'Member'" -Property 'UserType,SignInActivity,AccountEnabled,City,CompanyName,Country,Department,DisplayName,GivenName,SurName,ID,JobTitle,Mail,MemberOf,State,UserPrincipalName,LastLogonTimestamp,SecurityIdentifier'|select *, @{N='LastLogonTimestamp';E={ [datetime]$_.LastLogonTimestamp}}
 FOREACH($user in $users)
 {
     #get-MgUser -UserId $user.ID -Property SignInActivity|select LastSignInDateTime
@@ -105,17 +111,17 @@ FOREACH($user in $users)
 
 #Get-AzAdUser -select 'Department,AccountEnabled,Department,UserType,UserPrincipalName,GivenName,SurName,ApproximateLastSignInDateTime,Manager,JobTitle,Identity,EmployeeType,Department,Country,City,StreetAddress,State,PostalCode,OfficeLocation' -AppendSelected|select *|where($_.UserType -ne 'Guest')
 
-$users|select DisplayName,@{N='SID';E={($_.SecurityIdentifier)}},givenName,surName,UserPrincipalName,@{N='Domain';E={($_.UserPrincipalName.split('@')[1])}},Department,LastLogonTimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},JobTitle,ID,Groups
+$users|select DisplayName,@{N='SID';E={($_.SecurityIdentifier)}},givenName,surName,UserPrincipalName,@{N='Domain';E={($_.UserPrincipalName.split('@')[1])}},Department,LastLogonTimestamp,@{N='dayssincelogon';E={(new-timespan -start (get-date $_.LastLogonTimestamp -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},JobTitle,ID,Groups|export-csv $rptFolder$runtime-Azure_Users.csv -NoTypeInformation
 
 #$azure_users = Get-AzADUser
 #FOREACH($AZUser in $azure_users)
 #{Get-MGUser}
 
 # Create a variable to store the list of Azure users
-$azure_users_table = @()
+#$azure_users_table = @()
 
 # Loop through the list of Azure users and add them to the variable
-foreach ($azure_user in $azure_users) {
+<# foreach ($azure_user in $azure_users) {
   $azure_users_table += [ordered]@{
     DisplayName = $azure_user.DisplayName
     FirstName = $azure_user.FirstName
@@ -142,3 +148,4 @@ foreach ($azure_user in $azure_users) {
 
 # Export the list of Azure users to a CSV file
 Export-Csv -Path "azure_users.csv" -InputObject $azure_users_table -Header UserName,FirstName,LastName,Mail,Directory,Department,LastSignIn,DaysSinceLastSignIn,JobTitle,AccountStatus,Groups,OfficePhone,MobilePhone,Notes,Created,Changed,Location,City,AccountLocked,AccountExpires
+#>
