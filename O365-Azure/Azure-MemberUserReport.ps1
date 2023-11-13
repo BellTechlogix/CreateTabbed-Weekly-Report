@@ -1,11 +1,21 @@
+$ver = '2'
+
 <#
-	O365User Report.ps1
+	Azure Member User Report.ps1
 	Created By - Kristopher Roy
 	Created On - 27 Oct 2021
-	Modified On - 27 Oct 2021
+	Modified On - 13 Nov 2023
 
-	This Script Requires and O365 account with permissions to connect and pull users. Pulls a report of all O365 User accounts
+	This Script Requires and O365 account with permissions to connect and pull users. Pulls a report of all O365/Azure User accounts
 #>
+
+#Verify most recent version being used
+$curver = $ver
+$data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CreateTabbed-Weekly-Report/master/O365-Azure/Azure-MemberUserReport.ps1
+Invoke-Expression ($data.substring(0,13))
+if($curver -ge $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
+ELSEIF($curver -lt $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
+EXIT}
 
 #config file
 $scriptpath = "E:\Scripts\WeeklyReporting"

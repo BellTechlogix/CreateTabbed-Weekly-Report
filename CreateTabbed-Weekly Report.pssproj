@@ -32,7 +32,7 @@
     <Compile Include="Ivanti\CreateTabbed-Weekly Report-Ivanti.ps1" />
     <Compile Include="O365-Azure\Get-AzureADUser.ps1" />
     <Compile Include="O365-Azure\Intune-DeviceReport.ps1" />
-    <Compile Include="O365-Azure\O365User Report.ps1" />
+    <Compile Include="O365-Azure\Azure-MemberUserReport.ps1" />
     <Compile Include="O365-Azure\O365-AllComputers-Report.ps1" />
     <Compile Include="SCCM\CreateTabbed-Weekly Report-SCCM.ps1" />
     <Compile Include="Ivanti\Ivanti-Computer-Info.ps1" />
