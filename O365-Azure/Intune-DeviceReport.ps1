@@ -1,10 +1,10 @@
-﻿$ver = '2'
+﻿$ver = '2.1'
 
 <#
 	Intune-DeviceReport.ps1
 	Created By - Kristopher Roy
 	Created On - Mar 2022
-	Modified On - 13 Nov 2023
+	Modified On - 30 Jan 2024
 #>
 
 #Verify most recent version being used
@@ -17,26 +17,34 @@ EXIT}
 
 #config file
 $scriptpath = "C:\Projects\GTIL\Reports\CreateTabbed-Weekly-Report"
-[xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
-#Organization that the report is for
-$org = $cfg.Settings.DefaultSettings.OrgName
-$tenant = $cfg.Settings.DefaultSettings.TenantID
-# Read the credentials
-$Credentials = Import-Clixml -Path $scriptpath\O365-Azure\Access.xml
+$rptFolder = "C:\Projects\GTIL\Reports\"
+$runtime = Get-Date -Format "yyyyMMMdd"
+#uncoment if using a config file for variables
+#[xml]$cfg = Get-Content $scriptpath"\RptCFGFile.xml"
+#Organization that the report is for uncomment the cfg file version or static
+#$org = $cfg.Settings.DefaultSettings.OrgName
+$org = "GTIL"
+#Tenant you are connecting to uncomment the cfg file version or static
+#$tenant = $cfg.Settings.DefaultSettings.TenantID
+$tenant = "1f05524b-c860-46e3-a2e8-4072506b3e4a"
+# Read the credentials if you have generated for automation otherwise comment out
+#$Credentials = Import-Clixml -Path $scriptpath\O365-Azure\Access.xml
 
 $devtype = @{"Windows"="Workstation/Laptop"; "iOS"="Mobile Device"; "Android"="Mobile Device"}
 
 #Disconnect-MgGraph
-disconnect-mggraph
+#disconnect-mggraph
 #connect-MgGraph
-connect-MgGraph -TenantId $tenant -clientsecretcredential $credentials
+#Uncomment the connection string you need
+#connect-MgGraph -TenantId $tenant -clientsecretcredential $credentials
+connect-MgGraph -TenantId $tenant
 
 $devices = Get-MgDeviceManagementManagedDevice|select *
-#Get-MgDevice -Property *|select *
-Foreach($dev in $devices)
-{
-     
-    get-mgdevice -DeviceId $dev.AzureADDeviceId
-}
 	
-$Devices = $Devices|select @{N='Name';E={$_.deviceName}},@{N='OwnerType';E={$_.ManagedDeviceOwnerType}},@{N='PrimaryUser';E={$_.UserPrincipalName}},EnrolledDateTime,LastSyncDateTime,@{N='dayssinceSync';E={(new-timespan -start (get-date $_.LastSyncDateTime -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},@{N='deviceType';E={$devtype[$_.OperatingSystem]}},Manufacturer,Model,IMEI,SerialNumber,OperatingSystem,OSVersion
+$Devices|select @{N='Name';E={$_.deviceName}},@{N='OwnerType';E={$_.ManagedDeviceOwnerType}},@{N='PrimaryUser';E={$_.UserPrincipalName}},EnrolledDateTime,LastSyncDateTime,@{N='dayssinceSync';E={(new-timespan -start (get-date $_.LastSyncDateTime -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},@{N='deviceType';E={$devtype[$_.OperatingSystem]}},Manufacturer,Model,IMEI,SerialNumber,OperatingSystem,OSVersion|export-csv $rptFolder$runtime-IntuneDeviceReport.csv -NoTypeInformation
+
+#cleanup old coppies
+$Daysback = '-14'
+$CurrentDate = Get-Date
+$DateToDelete = $CurrentDate.AddDays($Daysback)
+Get-ChildItem $rptFolder | Where-Object { $_.LastWriteTime -lt $DatetoDelete -and $_.Name -like "*IntuneDeviceReport*"} | Remove-Item
