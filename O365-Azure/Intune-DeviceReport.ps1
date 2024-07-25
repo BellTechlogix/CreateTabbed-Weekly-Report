@@ -41,7 +41,7 @@ connect-MgGraph -TenantId $tenant -clientsecretcredential $clientsecretcreds
 $devices = Get-MgDeviceManagementManagedDevice|select *
 	
 $Devices|select @{N='Name';E={$_.deviceName}},@{N='OwnerType';E={$_.ManagedDeviceOwnerType}},@{N='PrimaryUser';E={$_.UserPrincipalName}},EnrolledDateTime,LastSyncDateTime,@{N='dayssinceSync';E={(new-timespan -start (get-date $_.LastSyncDateTime -Hour "00" -Minute "00") -End (get-date -Hour "00" -Minute "00")).Days}},@{N='deviceType';E={$devtype[$_.OperatingSystem]}},Manufacturer,Model,IMEI,SerialNumber,OperatingSystem,OSVersion|export-csv $rptFolder$runtime-IntuneDeviceReport.csv -NoTypeInformation
-
+$Report = $rptFolder$runtime-IntuneDeviceReport.csv
 
 #Section to generate and send mail report
 $powershellVersion = $PSVersionTable.PSVersion
