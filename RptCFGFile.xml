@@ -7,6 +7,7 @@
     <DomainRoot2>dc=mydomain2,dc=com</DomainRoot2>
     <DC>mydc.mydomain.com</DC>
     <DC2>mydc2.mydomain.com</DC2>
+    <TenantId>1f05524b-c860-46e3-a2e8-1234546789</TenantId>
   </DefaultSettings>
 
 	<ServerSettings>
@@ -24,5 +25,6 @@
 		<SMTPServer>SMTP_Server_Name</SMTPServer>
 		<FromAddress>Reports@domainname.com</FromAddress>
 		<ToAddress>kroy@belltechlogix.com,twheeler@belltechlogix.com</ToAddress>
+    <TenantId>1f05524b-c860-46e3-a2e8-123456789</TenantId>
 	</EmailSettings>
 </Settings>
